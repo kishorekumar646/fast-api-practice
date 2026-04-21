@@ -1,0 +1,24 @@
+from typing import Union
+from fastapi import FastAPI
+from models import Item
+
+version = 'v1'
+
+app = FastAPI(
+    title="My Item Cart",
+    summary="This is for practice CRUD operations page",
+    version=version,
+    docs_url='/api/{version}/docs',
+    redoc_url='/api/{version}/redocs'
+)
+
+item_list = []
+
+@app.get('/items')
+async def get_items():
+    return {"items": item_list}
+
+@app.post('/items')
+async def create_items(item: Item):
+    item_list.append(item)
+    return {"message": "Succefully added item into cart"}
