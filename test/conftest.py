@@ -1,12 +1,10 @@
 import pytest
 import uuid
-import sys
-import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
-from src.books.schemas import Book
 from datetime import datetime
 from fastapi.testclient import TestClient
-from src.main import app
+from src import app
+from src.books.schemas import Book
+
 
 @pytest.fixture(scope="module")
 def client():
@@ -18,12 +16,13 @@ def client():
 def test_book():
     return Book(
         uid=uuid.uuid4(),
-        title='test',
-        author='test_author',
-        publisher='test_publisher',
-        published_date=datetime.now(),
+        title="test",
+        author="test_author",
+        publisher="test_publisher",
+        published_date="2024-01-01",
         page_count=100,
-        language='en',
+        language="en",
+        user_uid=None,
         created_at=datetime.now(),
-        updated_at=datetime.now()
+        updated_at=datetime.now(),
     )

@@ -1,29 +1,22 @@
 import uuid
 from datetime import datetime
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
-class Account(BaseModel):
-    uid: uuid.UUID
-    username: str
-    password: str
-    email: str
-    full_name: str
-    created_at: datetime
-    updated_at: datetime
-
-class AccountCreateModel(BaseModel):
-    username: str
-    password: str
-    email: str
-    full_name: str
 
 class AccountUpdateModel(BaseModel):
     username: str
-    password: str
+    first_name: str
+    last_name: str
     email: str
-    full_name: str
 
-class LoginModel(BaseModel):
+
+class AccountResponse(BaseModel):
+    uid: uuid.UUID
     username: str
-    password: str
-
+    email: str
+    first_name: str
+    last_name: str
+    role: str
+    is_verified: bool
+    created_at: datetime
+    updated_at: datetime
