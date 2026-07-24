@@ -1,24 +1,45 @@
-from typing import Union
-from fastapi import FastAPI
-from models import Item
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
 
-version = 'v1'
+# Virtual environment
+venv/
+.venv/
+env/
+.env/
 
-app = FastAPI(
-    title="My Item Cart",
-    summary="This is for practice CRUD operations page",
-    version=version,
-    docs_url='/api/{version}/docs',
-    redoc_url='/api/{version}/redocs'
-)
+# Environment variables
+.env
+.env.local
+.env.*.local
 
-item_list = []
+# IDE
+.vscode/
+.idea/
+*.suo
+*.swp
+*.swo
 
-@app.get('/items')
-async def get_items():
-    return {"items": item_list}
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
 
-@app.post('/items')
-async def create_items(item: Item):
-    item_list.append(item)
-    return {"message": "Succefully added item into cart"}
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Database
+*.db
+*.sqlite3
