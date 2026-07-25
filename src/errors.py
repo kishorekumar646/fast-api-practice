@@ -11,6 +11,10 @@ class BookNotFoundException(Exception):
 BookNotFound = BookNotFoundException
 
 
+class BookAlreadyExists(Exception):
+    pass
+
+
 class AccountNotFoundException(Exception):
     pass
 
@@ -44,6 +48,13 @@ def create_exception_handler(
 
 
 def register_all_errors(app: FastAPI):
+    app.add_exception_handler(
+        BookAlreadyExists,
+        lambda request, exc: JSONResponse(
+            status_code=status.HTTP_409_CONFLICT,
+            content={"detail": "A book with this title and author already exists in your collection"},
+        ),
+    )
     app.add_exception_handler(
         UserAlreadyExist,
         lambda request, exc: JSONResponse(

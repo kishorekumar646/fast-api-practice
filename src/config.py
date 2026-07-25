@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    DATABASE_URL: str = "sqlite+aiosqlite:///./bookstore.db"
+    DATABASE_URL: str = "sqlite+aiosqlite:///./my-bookstore.db"
     JWT_SECRET: str = "your_jwt_secret_change_in_production"
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRY: int = 3600      # 1 hour

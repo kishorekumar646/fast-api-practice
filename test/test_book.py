@@ -48,7 +48,8 @@ def test_get_all_books(client, auth_headers):
 
 
 def test_update_book(client, auth_headers):
-    response = client.post(f"{BOOKS_PREFIX}/", json=sample_book_data, headers=auth_headers)
+    book_data = {**sample_book_data, "title": "Book To Update"}
+    response = client.post(f"{BOOKS_PREFIX}/", json=book_data, headers=auth_headers)
     assert response.status_code == 201
     book_uid = response.json()["uid"]
 
@@ -68,7 +69,8 @@ def test_update_book_not_found(client, auth_headers):
 
 
 def test_delete_book(client, auth_headers):
-    response = client.post(f"{BOOKS_PREFIX}/", json=sample_book_data, headers=auth_headers)
+    book_data = {**sample_book_data, "title": "Book To Delete"}
+    response = client.post(f"{BOOKS_PREFIX}/", json=book_data, headers=auth_headers)
     assert response.status_code == 201
     book_uid = response.json()["uid"]
 

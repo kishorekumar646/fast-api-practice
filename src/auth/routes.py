@@ -3,18 +3,20 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from src.db.db import get_session
 from src.db.redis import add_token_to_blocklist
 from src.auth.schemas import UserCreateModel, UserLoginModel, TokenResponse, UserResponse
-from src.auth.service import UserService
 from src.auth.utils import verify_password, create_access_token, create_refresh_token
 from src.accounts.dependencies import AccessTokenBearer, RefreshTokenBearer
 
+from .interfaces import IUserService
+from .service import get_user_service
+
 auth_router = APIRouter()
-user_service = UserService()
 
 
 @auth_router.post("/signup", status_code=status.HTTP_201_CREATED)
 async def signup(
     user_data: UserCreateModel,
     session: AsyncSession = Depends(get_session),
+    user_service: IUserService = Depends(get_user_service),
 ):
     existing = await user_service.get_user_by_email(user_data.email, session)
     if existing:
@@ -35,6 +37,7 @@ async def signup(
 async def login(
     credentials: UserLoginModel,
     session: AsyncSession = Depends(get_session),
+    user_service: IUserService = Depends(get_user_service),
 ):
     user = await user_service.get_user_by_email(credentials.email, session)
     if not user or not verify_password(credentials.password, user.password_hash):

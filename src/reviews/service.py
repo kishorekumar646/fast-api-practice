@@ -3,10 +3,11 @@ from datetime import datetime
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 from src.db.models import Review
+from .interfaces import IReviewService
 from .schemas import ReviewCreateModel, ReviewUpdateModel
 
 
-class ReviewService:
+class ReviewService(IReviewService):
 
     async def get_all_reviews(self, session: AsyncSession) -> list[Review]:
         result = await session.exec(select(Review))
@@ -50,3 +51,7 @@ class ReviewService:
         await session.delete(review)
         await session.commit()
         return True
+
+
+def get_review_service() -> IReviewService:
+    return ReviewService()

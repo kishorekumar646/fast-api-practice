@@ -5,11 +5,12 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from src.db.db import get_session
 from src.accounts.dependencies import AccessTokenBearer, RoleChecker
 from src.books.schemas import BookDetailModel
+
+from .interfaces import ITagService
 from .schemas import TagCreateModel, TagResponse
-from .service import TagService
+from .service import get_tag_service
 
 tag_router = APIRouter()
-tag_service = TagService()
 access_token_bearer = AccessTokenBearer()
 role_checker = Depends(RoleChecker(["admin", "user"]))
 admin_checker = RoleChecker(["admin"])
@@ -19,15 +20,17 @@ admin_checker = RoleChecker(["admin"])
 async def get_all_tags(
     session: AsyncSession = Depends(get_session),
     _: dict = Depends(access_token_bearer),
+    tag_service: ITagService = Depends(get_tag_service),
 ):
     return await tag_service.get_all_tags(session)
 
 
-@tag_router.post("/", response_model=TagResponse, status_code=status.HTTP_201_CREATED)
+@tag_router.post("/", response_model=TagResponse, status_code=status.HTTP_201_CREATED, dependencies=[role_checker])
 async def create_tag(
     data: TagCreateModel,
     session: AsyncSession = Depends(get_session),
-    _: dict = Depends(admin_checker),
+    _: dict = Depends(access_token_bearer),
+    tag_service: ITagService = Depends(get_tag_service),
 ):
     return await tag_service.create_tag(data, session)
 
@@ -37,6 +40,7 @@ async def delete_tag(
     tag_uid: uuid.UUID,
     session: AsyncSession = Depends(get_session),
     _: dict = Depends(admin_checker),
+    tag_service: ITagService = Depends(get_tag_service),
 ):
     deleted = await tag_service.delete_tag(tag_uid, session)
     if not deleted:
@@ -49,6 +53,7 @@ async def add_tag_to_book(
     tag_uid: uuid.UUID,
     session: AsyncSession = Depends(get_session),
     _: dict = Depends(access_token_bearer),
+    tag_service: ITagService = Depends(get_tag_service),
 ):
     book = await tag_service.add_tag_to_book(book_uid, tag_uid, session)
     if not book:
@@ -62,6 +67,7 @@ async def remove_tag_from_book(
     tag_uid: uuid.UUID,
     session: AsyncSession = Depends(get_session),
     _: dict = Depends(access_token_bearer),
+    tag_service: ITagService = Depends(get_tag_service),
 ):
     book = await tag_service.remove_tag_from_book(book_uid, tag_uid, session)
     if not book:

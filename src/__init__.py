@@ -15,6 +15,10 @@ version_prefix = f"/api/{version}"
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """
+
+    :type app: object
+    """
     await init_db()
     yield
 

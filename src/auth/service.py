@@ -3,9 +3,10 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from src.db.models import User
 from src.auth.schemas import UserCreateModel
 from src.auth.utils import hash_password
+from .interfaces import IUserService
 
 
-class UserService:
+class UserService(IUserService):
 
     async def get_user_by_email(self, email: str, session: AsyncSession) -> User | None:
         result = await session.exec(select(User).where(User.email == email))
@@ -28,3 +29,7 @@ class UserService:
         await session.commit()
         await session.refresh(user)
         return user
+
+
+def get_user_service() -> IUserService:
+    return UserService()

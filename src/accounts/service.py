@@ -1,13 +1,17 @@
 import uuid
 from datetime import datetime
+from typing import Any
+
+from sqlalchemy import Row
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 from src.db.models import User
 from src.errors import AccountNotFoundException
+from .interfaces import IAccountService
 from .schemas import AccountUpdateModel
 
 
-class AccountService:
+class AccountService(IAccountService):
 
     @staticmethod
     async def get_all_accounts(session: AsyncSession) -> list[User]:
@@ -15,7 +19,7 @@ class AccountService:
         return list(result.all())
 
     @staticmethod
-    async def get_account(user_uid: uuid.UUID, session: AsyncSession) -> User:
+    async def get_account(user_uid: uuid.UUID, session: AsyncSession) -> Row[Any]:
         result = await session.exec(select(User).where(User.uid == user_uid))
         user = result.first()
         if not user:
@@ -38,3 +42,7 @@ class AccountService:
         user = await self.get_account(user_uid, session)
         await session.delete(user)
         await session.commit()
+
+
+def get_account_service() -> IAccountService:
+    return AccountService()

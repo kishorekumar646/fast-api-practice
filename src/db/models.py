@@ -76,7 +76,7 @@ class Book(SQLModel, table=True):
 class Review(SQLModel, table=True):
     __tablename__ = "reviews"
     uid: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    rating: int = Field(lt=5)
+    rating: int = Field(ge=1, le=5)
     review_text: str
     user_uid: Optional[uuid.UUID] = Field(default=None, foreign_key="users.uid")
     book_uid: Optional[uuid.UUID] = Field(default=None, foreign_key="books.uid")

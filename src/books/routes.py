@@ -5,31 +5,33 @@ from fastapi import APIRouter, Depends, status, Response
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from src.accounts.dependencies import AccessTokenBearer, RoleChecker
-from src.books.service import BookService
 from src.db.db import get_session
-
-from .schemas import Book, BookCreateModel, BookDetailModel, BookUpdateModel
 from src.errors import BookNotFound
 
+from .interfaces import IBookService
+from .schemas import Book, BookCreateModel, BookDetailModel, BookUpdateModel
+from .service import get_book_service
+
 book_router = APIRouter()
-book_service = BookService()
 access_token_bearer = AccessTokenBearer()
 role_checker = Depends(RoleChecker(["admin", "user"]))
 
 
-@book_router.get("/", response_model=List[Book], dependencies=[role_checker])
+@book_router.get("/", response_model=List[BookDetailModel], dependencies=[role_checker])
 async def get_all_books(
         session: AsyncSession = Depends(get_session),
         _: dict = Depends(access_token_bearer),
+        book_service: IBookService = Depends(get_book_service),
 ):
     return await book_service.get_all_books(session)
 
 
-@book_router.get("/user/{user_uid}", response_model=List[Book], dependencies=[role_checker])
+@book_router.get("/user/{user_uid}", response_model=List[BookDetailModel], dependencies=[role_checker])
 async def get_user_book_submissions(
         user_uid: uuid.UUID,
         session: AsyncSession = Depends(get_session),
         _: dict = Depends(access_token_bearer),
+        book_service: IBookService = Depends(get_book_service),
 ):
     return await book_service.get_user_books(user_uid, session)
 
@@ -39,6 +41,7 @@ async def create_a_book(
         book_data: BookCreateModel,
         session: AsyncSession = Depends(get_session),
         token_details: dict = Depends(access_token_bearer),
+        book_service: IBookService = Depends(get_book_service),
 ) -> dict:
     user_id = token_details.get("user")["user_uid"]
     return await book_service.create_book(book_data, uuid.UUID(user_id), session)
@@ -49,6 +52,7 @@ async def get_book(
         book_uid: uuid.UUID,
         session: AsyncSession = Depends(get_session),
         _: dict = Depends(access_token_bearer),
+        book_service: IBookService = Depends(get_book_service),
 ) -> dict:
     book = await book_service.get_book(book_uid, session)
     if book:
@@ -62,6 +66,7 @@ async def update_book(
         book_update_data: BookUpdateModel,
         session: AsyncSession = Depends(get_session),
         _: dict = Depends(access_token_bearer),
+        book_service: IBookService = Depends(get_book_service),
 ) -> dict:
     updated_book = await book_service.update_book(book_uid, book_update_data, session)
     if updated_book is None:
@@ -74,6 +79,7 @@ async def delete_book(
         book_uid: uuid.UUID,
         session: AsyncSession = Depends(get_session),
         _: dict = Depends(access_token_bearer),
+        book_service: IBookService = Depends(get_book_service),
 ):
     book = await book_service.delete_book(book_uid, session)
     if book is None:

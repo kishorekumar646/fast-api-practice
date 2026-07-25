@@ -2,10 +2,11 @@ import uuid
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 from src.db.models import Tag, Book, BookTag
+from .interfaces import ITagService
 from .schemas import TagCreateModel
 
 
-class TagService:
+class TagService(ITagService):
 
     async def get_all_tags(self, session: AsyncSession) -> list[Tag]:
         result = await session.exec(select(Tag))
@@ -61,3 +62,7 @@ class TagService:
         await session.commit()
         await session.refresh(book)
         return book
+
+
+def get_tag_service() -> ITagService:
+    return TagService()
